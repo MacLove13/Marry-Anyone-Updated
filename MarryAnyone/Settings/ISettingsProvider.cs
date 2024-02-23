@@ -2,6 +2,7 @@
 {
     internal interface ISettingsProvider
     {
+        string Language { get; set; }
         string SexualOrientation { get; set; }
         bool Polygamy { get; set; }
         bool PregnancyPlus { get; set; }

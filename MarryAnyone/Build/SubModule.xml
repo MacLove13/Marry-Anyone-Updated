@@ -1,0 +1,28 @@
+﻿ <Module>
+     <Name value="Marry Anyone Updated"/>
+     <Id value="MarryAnyoneUpdated"/>
+     <Version value="v3.2.0.0"/>
+     <SingleplayerModule value="true"/>
+     <MultiplayerModule value="false"/>
+     <DependedModules>
+         <DependedModule Id="Native"/>
+         <DependedModule Id="SandBoxCore"/>
+         <DependedModule Id="Sandbox"/>
+     </DependedModules>
+     <SubModules>
+         <SubModule>
+             <Name value="MarryAnyone"/>
+             <DLLName value="MarryAnyone.dll"/>
+             <SubModuleClassType value="MarryAnyone.SubModule"/>
+             <Tags>
+                 <Tag key="DedicatedServerType" value="none" />
+                 <Tag key="IsNoRenderModeElement" value="false" />
+             </Tags>
+         </SubModule>
+     </SubModules>
+     <Xmls>
+      <XmlNode>
+        <XmlName id="GameText" path="ma_module_strings"/>
+      </XmlNode>
+    </Xmls>
+ </Module>

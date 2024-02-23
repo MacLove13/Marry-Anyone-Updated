@@ -21,6 +21,12 @@ namespace MarryAnyone
             MAConfig.Initialize();
         }
 
+        public string Language
+        {
+            get => _provider.Language;
+            set => _provider.Language = value;
+        }
+
         public string SexualOrientation
         {
             get => _provider.SexualOrientation;

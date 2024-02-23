@@ -10,10 +10,22 @@ namespace MarryAnyone.Settings
     {
         public override string Id => "MASettings";
 
-        public override string DisplayName => "Marry Anyone" + $" {typeof(MCMSettings).Assembly.GetName().Version.ToString(3)}";
+        public override string DisplayName => "Marry Anyone Updated" + $" {typeof(MCMSettings).Assembly.GetName().Version.ToString(3)}";
 
         public override string FolderName => "MarryAnyone";
 
+        [SettingPropertyDropdown("{=language}Language", RequireRestart = false, HintText = "{=language_desc}Set Mod language.")]
+        [SettingPropertyGroup("{=language}Language", GroupOrder = 6)]
+        public Dropdown<string> LanguageDropdown { get; set; } = new Dropdown<string>(new string[]
+        {
+             "en"
+        }, 0);
+
+        public string Language
+        {
+            get => LanguageDropdown.SelectedValue;
+            set => LanguageDropdown.SelectedValue = value;
+        }
 
         [SettingPropertyDropdown("{=orientation}Sexual Orientation", Order = 0, RequireRestart = false, HintText = "{=orientation_desc}Player character can choose what sex the player can marry.")]
         [SettingPropertyGroup("{=relationship}Relationship", GroupOrder = 0)]
@@ -24,7 +36,7 @@ namespace MarryAnyone.Settings
             "Bisexual"
         }, 0);
 
-        public string SexualOrientation 
+        public string SexualOrientation
         {
             get => SexualOrientationDropdown.SelectedValue;
             set => SexualOrientationDropdown.SelectedValue = value;

@@ -27,36 +27,40 @@ namespace MarryAnyone.CampaignSystem
             {
                 return "Format is \"marry_anyone.set_main_hero_primary_spouse [HeroName]\".";
             }
+
             string text = CampaignCheats.ConcatenateString(strings);
             Hero hero = CampaignCheats.GetHero(text);
             if (hero is not null) 
             {
-                if (Hero.MainHero.ExSpouses.Contains(hero)) 
+                if (Hero.MainHero.ExSpouses is not null)
                 {
-                    string result = "Success";
-                    Hero.MainHero.Spouse = hero;
-                    hero.Spouse = Hero.MainHero;
-                    Helpers.RemoveExSpouses(hero);
-                    Helpers.RemoveExSpouses(Hero.MainHero);
-                    MASettings settings = new();
-                    if (settings.PregnancyPlus)
+                    if (Hero.MainHero.ExSpouses.Contains(hero))
                     {
-                        settings.PregnancyPlus = false;
-                        result += "\nPregnancy+ disabled to prevent primary spouse from changing.";
+                        string result = "Success";
+                        Hero.MainHero.Spouse = hero;
+                        hero.Spouse = Hero.MainHero;
+                        Helpers.RemoveExSpouses(hero);
+                        Helpers.RemoveExSpouses(Hero.MainHero);
+                        MASettings settings = new();
+                        if (settings.PregnancyPlus)
+                        {
+                            settings.PregnancyPlus = false;
+                            result += "\nPregnancy+ disabled to prevent primary spouse from changing.";
+                        }
+                        return result;
                     }
-                    return result;
-                }
-                else if (Hero.MainHero.Spouse == hero)
-                {
-                    return "Hero is already the Primary Spouse";
-                }
-                else if (!hero.IsAlive)
-                {
-                    return "Hero " + text + " is dead.";
-                }
-                else
-                {
-                    return "Hero is not married to the Main Hero";
+                    else if (Hero.MainHero.Spouse == hero)
+                    {
+                        return "Hero is already the Primary Spouse";
+                    }
+                    else if (!hero.IsAlive)
+                    {
+                        return "Hero " + text + " is dead.";
+                    }
+                    else
+                    {
+                        return "Hero is not married to the Main Hero";
+                    }
                 }
             }
             return "Hero is not Found.\nFormat is \"marry_anyone.set_main_hero_primary_spouse [HeroName]\".";
@@ -170,6 +174,32 @@ namespace MarryAnyone.CampaignSystem
                 return "Success";
             }
             return "Please enter \"heterosexual\", \"homosexual\", or \"bisexual\"";
+        }
+
+        [CommandLineFunctionality.CommandLineArgumentFunction("set_language", "marry_anyone")]
+        public static string SetLanguage(List<string> strings)
+        {
+            MASettings settings = new();
+            if (!CampaignCheats.CheckParameters(strings, 1) || CampaignCheats.CheckHelp(strings))
+            {
+                return "Format is \"marry_anyone.set_language [\"en\"/\"pt-BR\"].";
+            }
+            string template = CampaignCheats.ConcatenateString(strings);
+            if (template == null)
+            {
+                return "Please enter \"en\", \"pt-BR\"";
+            }
+            else if (string.Equals(template, "en", StringComparison.OrdinalIgnoreCase))
+            {
+                settings.SexualOrientation = "en";
+                return "Success";
+            }
+            else if (string.Equals(template, "pt-BR", StringComparison.OrdinalIgnoreCase))
+            {
+                settings.SexualOrientation = "pt-BR";
+                return "Success";
+            }
+            return "Please enter \"en\", \"pt-BR\"";
         }
 
         [CommandLineFunctionality.CommandLineArgumentFunction("set_faction_leader", "marry_anyone")]

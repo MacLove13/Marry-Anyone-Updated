@@ -16,6 +16,7 @@ using TaleWorlds.Localization;
 using MarryAnyone.Actions;
 using static MarryAnyone.Helpers;
 using static MarryAnyone.Debug;
+using TaleWorlds.Library;
 
 namespace MarryAnyone.Behaviors
 {
@@ -82,7 +83,7 @@ namespace MarryAnyone.Behaviors
 
         protected void AddDialogs(CampaignGameStarter starter)
         {
-            /* RecruitEveryone-like dialogs that can handle hero creation process if needed */
+            // RecruitEveryone-like dialogs that can handle hero creation process if needed
             // Heroes like Wanderers and Lords, need to distinguish the two
             RomanceCharacter(starter, "hero_main_options", "lord_pretalk");
             // Tavernkeeper
@@ -111,7 +112,7 @@ namespace MarryAnyone.Behaviors
             RomanceCharacter(starter, "ransom_broker_talk");
             // Probably more that I don't recall...
 
-            /* After the initial romance option */
+            // After the initial romance option
             // Skip barter and marry immediately
             starter.AddDialogLine("MA" + "hero_courtship_persuasion_2_success", "lord_conclude_courtship_stage_2", "close_window", "{=xwS10c1b}Yes... I think I would be honored to accept your proposal.", new ConversationSentence.OnConditionDelegate(MA_marriage_on_condition), new ConversationSentence.OnConsequenceDelegate(MA_marriage_on_consequence), 200, null);
             // In case there is a fail
@@ -121,7 +122,7 @@ namespace MarryAnyone.Behaviors
             starter.AddDialogLine("MA" + "hero_courtship_persuasion_start", "hero_courtship_task_1_begin_reservations", "lord_conclude_courtship_stage_2", "{=bW3ygxro}Yes, it's good to have a chance to get to know each other.", new ConversationSentence.OnConditionDelegate(MA_skip_courtship_conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(MA_conversation_player_opens_courtship_on_consequence), 200, null);
             starter.AddDialogLine("MA" + "hero_courtship_persuasion_2_start", "hero_courtship_task_2_begin_reservations", "lord_conclude_courtship_stage_2", "{=VNFKqpyV}Yes, well, I've been thinking about that.", new ConversationSentence.OnConditionDelegate(MA_skip_courtship_conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(MA_conversation_player_opens_courtship_on_consequence), 200, null);
 
-            /* Lord courtship dialogs */
+            // Lord courtship dialogs
             // Lord skip courtship
             starter.AddDialogLine("MA" + "Lord" + "hero_courtship_persuasion_2_success", "lord_conclude_courtship_stage_2", "close_window", "{=xwS10c1b}Yes... I think I would be honored to accept your proposal.", new ConversationSentence.OnConditionDelegate(lord_skip_courtship_on_condition), new ConversationSentence.OnConsequenceDelegate(ApplyMarriageAction), 200, null);
             // Essentially for each check here turn the marriage flag on
@@ -152,7 +153,7 @@ namespace MarryAnyone.Behaviors
         {
             /* LordConversationCampaignBehavior */
             // There is something to discuss
-            starter.AddPlayerLine("MA" + "main_option_discussions_3", start, start + "lord_talk_speak_diplomacy", "{=lord_conversations_343}There is something I'd like to discuss.", new ConversationSentence.OnConditionDelegate(conversation_hero_main_options_discussions), new ConversationSentence.OnConsequenceDelegate(create_new_hero_consequence), 100, null, null);
+            starter.AddPlayerLine("MA" + "main_option_discussions_3",start, start + "lord_talk_speak_diplomacy", "{=lord_conversations_343}There is something I'd like to discuss.", new ConversationSentence.OnConditionDelegate(conversation_hero_main_options_discussions), new ConversationSentence.OnConsequenceDelegate(create_new_hero_consequence), 100, null, null);
             // Reply to inquiry
             starter.AddDialogLine("MA" + "conversation_lord_agrees_to_discussion_on_condition", start + "lord_talk_speak_diplomacy", start + "lord_talk_speak_diplomacy_2", "{=OD1m1NYx}{STR_INTRIGUE_AGREEMENT}", new ConversationSentence.OnConditionDelegate(conversation_lord_agrees_to_discussion_on_condition), null, 100, null);
             // AddFinalLines
@@ -168,11 +169,11 @@ namespace MarryAnyone.Behaviors
 
             // Skip courtship option
             starter.AddPlayerLine("MA" + "lord_start_courtship_response_player_offer", start + "lord_start_courtship_response_player_offer", "lord_conclude_courtship_stage_2", "{=cKtJBdPD}I wish to offer my hand in marriage.", new ConversationSentence.OnConditionDelegate(MA_skip_courtship_conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(MA_conversation_player_opens_courtship_on_consequence), 120, null, null);
-            starter.AddPlayerLine("MA" + "lord_start_courtship_response_player_offer_2", start + "lord_start_courtship_response_player_offer", "lord_conclude_courtship_stage_2", "{=gnXoIChw}Perhaps you and I...", new ConversationSentence.OnConditionDelegate(MA_skip_courtship_conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(MA_conversation_player_opens_courtship_on_consequence), 120, null, null);
+            starter.AddPlayerLine("MA" + "lord_start_courtship_response_player_offer_2", start + "lord_start_courtship_response_player_offer", "lord_conclude_courtship_stage_2", "Nós devemos nos casar...", new ConversationSentence.OnConditionDelegate(MA_skip_courtship_conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(MA_conversation_player_opens_courtship_on_consequence), 120, null, null);
 
             // After initial courtship ask for hand in marriage
             starter.AddPlayerLine("MA" + "lord_start_courtship_response_player_offer", start + "lord_start_courtship_response_player_offer", "lord_start_courtship_response_2", "{=cKtJBdPD}I wish to offer my hand in marriage.", new ConversationSentence.OnConditionDelegate(MA_conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(MA_conversation_player_opens_courtship_on_consequence), 120, null, null);
-            starter.AddPlayerLine("MA" + "lord_start_courtship_response_player_offer_2", start + "lord_start_courtship_response_player_offer", "lord_start_courtship_response_2", "{=gnXoIChw}Perhaps you and I...", new ConversationSentence.OnConditionDelegate(MA_conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(MA_conversation_player_opens_courtship_on_consequence), 120, null, null);
+            starter.AddPlayerLine("MA" + "lord_start_courtship_response_player_offer_2", start + "lord_start_courtship_response_player_offer", "lord_start_courtship_response_2", "Nós devemos nos casar...", new ConversationSentence.OnConditionDelegate(MA_conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(MA_conversation_player_opens_courtship_on_consequence), 120, null, null);
             // Leave if not ready
             starter.AddPlayerLine("MA" + "lord_start_courtship_response_player_offer_nevermind", start + "lord_start_courtship_response_player_offer", end, "{=D33fIGQe}Never mind.", null, new ConversationSentence.OnConsequenceDelegate(conversation_exit_consequence), 120, null, null);
 
@@ -512,7 +513,7 @@ namespace MarryAnyone.Behaviors
             AgentName!(conversationAgent) = _companionHero.Name;
 
             // Meet character for first time
-            _companionHero.HasMet = true;
+            // _companionHero.HasMet = true;
 
             // Add hero to heroes list
             _heroes.Add(conversationAgent, _companionHero);
@@ -533,10 +534,10 @@ namespace MarryAnyone.Behaviors
             //CompanionAdjustEquipment!.Invoke(companionsCampaignBehaviorInstance, new object[] { _companionHero });
             CompanionAdjustEquipment!(companionsCampaignBehaviorInstance, _companionHero);
 
-            HeroHelper.DetermineInitialLevel(_companionHero);
+            // HeroHelper.DetermineInitialLevel(_companionHero);
 
-            CharacterDevelopmentCampaignBehavior characterDevelopmentCampaignBehaviorInstance = Campaign.Current.CampaignBehaviorManager.GetBehavior<CharacterDevelopmentCampaignBehavior>();
-            characterDevelopmentCampaignBehaviorInstance.DevelopCharacterStats(_companionHero);
+            // CharacterDevelopmentCampaignBehavior characterDevelopmentCampaignBehaviorInstance = Campaign.Current.CampaignBehaviorManager.GetBehavior<CharacterDevelopmentCampaignBehavior>();
+            // characterDevelopmentCampaignBehaviorInstance.DevelopCharacterStats(_companionHero);
 
             //character.HeroObject = _companionHero;
             //SetHeroObject!.SetValue(conversationCharacter, _companionHero);

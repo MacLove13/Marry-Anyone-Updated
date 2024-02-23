@@ -38,7 +38,16 @@ namespace MarryAnyone
 
         public static void RemoveExSpouses(Hero hero, RemoveExSpousesMode removalMode = RemoveExSpousesMode.Duplicates)
         {
-            List<Hero> _exSpousesList = _exSpouses!(hero);
+            // List<Hero> _exSpousesList = _exSpouses!(hero);
+            List<Hero> _exSpousesList = hero.ExSpouses;
+
+            InformationManager.DisplayMessage(new InformationMessage($"DEBUG: Run RemoveExSpouses.", Colors.Red));
+
+            /* if (hero.Spouse != null)
+            {
+                InformationManager.DisplayMessage(new InformationMessage($"Você já é casado.", Colors.Red));
+                return;
+            } */
 
             if (removalMode == RemoveExSpousesMode.Duplicates)
             {
@@ -77,9 +86,23 @@ namespace MarryAnyone
                 }
             }
 
-            MBReadOnlyList<Hero> ExSpousesReadOnlyList = new(_exSpousesList);
-            _exSpouses(hero) = _exSpousesList;
-            ExSpouses!(hero) = ExSpousesReadOnlyList;
+            if (_exSpousesList != null)
+            {
+                MBReadOnlyList<Hero> ExSpousesReadOnlyList = new MBReadOnlyList<Hero>(_exSpousesList);
+
+
+                string _exSpousesListPresent = _exSpousesList == null ? "Null" : "Present";
+                string readonlylist = ExSpousesReadOnlyList == null ? "Null" : "Present";
+
+                InformationManager.DisplayMessage(new InformationMessage($"_exSpousesList: {_exSpousesListPresent}", Colors.Red));
+                InformationManager.DisplayMessage(new InformationMessage($"ExSpousesReadOnlyList: {readonlylist}", Colors.Red));
+
+                if (_exSpouses != null && ExSpouses != null)
+                {
+                    _exSpouses(hero) = _exSpousesList;
+                    ExSpouses(hero) = ExSpousesReadOnlyList;
+                }
+            }
         }
 
         public static void CheatOnSpouse()

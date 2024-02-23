@@ -165,7 +165,8 @@ namespace MarryAnyone.Actions
                             {
                                 if (spouse.PartyBelongedTo.Army.LeaderParty == spouse.PartyBelongedTo)
                                 {
-                                    spouse.PartyBelongedTo.Army.DisperseArmy(Army.ArmyDispersionReason.Unknown);
+                                    DisbandArmyAction.ApplyByUnknownReason(spouse.PartyBelongedTo.Army);
+
                                 }
                                 else
                                 {

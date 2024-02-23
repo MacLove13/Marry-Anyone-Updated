@@ -4,6 +4,7 @@ using System.Linq;
 using HarmonyLib.BUTR.Extensions;
 using System;
 using System.Collections.Generic;
+using TaleWorlds.Library;
 
 namespace MarryAnyone.Models
 {
@@ -12,26 +13,27 @@ namespace MarryAnyone.Models
         private delegate IEnumerable<Hero> DiscoverAncestorsDelegate(DefaultMarriageModel instance, Hero hero, int n);
         private static readonly DiscoverAncestorsDelegate? DiscoverAncestors = AccessTools2.GetDelegate<DiscoverAncestorsDelegate>(typeof(DefaultMarriageModel), "DiscoverAncestors", new Type[] { typeof(Hero), typeof(int) });
 
-        private static bool _mainHeroMarriage = false;
-
-        private static bool _mainHero = false;
+        private bool _mainHeroMarriage = false;
+        private bool _mainHero = false;
 
         public override bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
         {
-            /* Section for AI heroes from the original method */
+            if (firstHero == null || secondHero == null)
+            {
+                return false;
+            }
+
             bool isMainHero = firstHero == Hero.MainHero || secondHero == Hero.MainHero;
             if (!isMainHero)
             {
-                // Other heroes use the DefaultMarriageModel
                 return base.IsCoupleSuitableForMarriage(firstHero, secondHero);
             }
-            /* Section for Marry Anyone method */
-            // DO NOT MARRY AGAIN!
+
             if (Romance.GetRomanticLevel(firstHero, secondHero) == Romance.RomanceLevelEnum.Marriage)
             {
                 return false;
             }
-            // Does not directly call IsSuitableForMarriage, instead calls CanMarry -> IsSuitableForMarriage
+
             bool canMarry1 = false;
             bool canMarry2 = false;
             _mainHeroMarriage = true;
@@ -59,12 +61,19 @@ namespace MarryAnyone.Models
             }
 
             MASettings settings = new();
-            // If incest setting is off then look for ancestor relations
+            if (settings == null)
+            {
+                return false;
+            }
+
             if (!settings.Incest)
             {
-                if (DiscoverAncestors!(this, firstHero, 3).Intersect(DiscoverAncestors(this, secondHero, 3)).Any())
+                if (DiscoverAncestors != null)
                 {
-                    return false;
+                    if (DiscoverAncestors(this, firstHero, 3).Intersect(DiscoverAncestors(this, secondHero, 3)).Any())
+                    {
+                        return false;
+                    }
                 }
             }
 
@@ -82,8 +91,6 @@ namespace MarryAnyone.Models
 
         public override bool IsSuitableForMarriage(Hero maidenOrSuitor)
         {
-            // Problem is with marriage bartering with a lack of info...
-            // Hence the use of a flag
             if (!_mainHeroMarriage)
             {
                 return base.IsSuitableForMarriage(maidenOrSuitor);
@@ -94,8 +101,6 @@ namespace MarryAnyone.Models
             }
             MASettings settings = new();
             bool spouses = maidenOrSuitor.Spouse is not null || maidenOrSuitor.ExSpouses.Any(exSpouse => exSpouse.IsAlive);
-            // Cheating should bypass this, while polygamy may or may not bypass this
-            // Polygamy should bypass if the main hero might have spouses but the other does not
             if (!spouses || settings.Cheating || (_mainHero && settings.Polygamy))
             {
                 if (maidenOrSuitor.IsFemale)

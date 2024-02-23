@@ -16,6 +16,12 @@ namespace MarryAnyone.Settings
             Instance = this;
         }
 
+        public string Language
+        {
+            get { return MAConfig.Language; }
+            set { MAConfig.Language = value; }
+        }
+
         public string SexualOrientation 
         { 
             get { return MAConfig.SexualOrientation; }
@@ -85,6 +91,8 @@ namespace MarryAnyone.Settings
 
     internal static class MAConfig
     {
+        private static string _language = "en";
+
         private static bool _polyamory = false;
 
         private static bool _polygamy = false;
@@ -201,6 +209,23 @@ namespace MarryAnyone.Settings
                 if (_polygamy != value)
                 {
                     _polygamy = value;
+                    Save();
+                }
+            }
+        }
+
+        [ConfigPropertyUnbounded]
+        public static string Language
+        {
+            get
+            {
+                return _language;
+            }
+            set
+            {
+                if (_language != value)
+                {
+                    _language = value;
                     Save();
                 }
             }
