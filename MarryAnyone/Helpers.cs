@@ -60,6 +60,10 @@ namespace MarryAnyone
                     _exSpousesList.Remove(hero.Spouse);
                     Print($"Removed duplicate spouse {hero.Spouse.Name}");
                 }
+                if (_exSpouses != null)
+{
+_exSpouses(hero) = _exSpousesList;
+}
             }
             else
             {
