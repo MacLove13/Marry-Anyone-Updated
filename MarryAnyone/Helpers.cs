@@ -38,71 +38,56 @@ namespace MarryAnyone
 
         public static void RemoveExSpouses(Hero hero, RemoveExSpousesMode removalMode = RemoveExSpousesMode.Duplicates)
         {
-            // List<Hero> _exSpousesList = _exSpouses!(hero);
-            List<Hero> _exSpousesList = hero.ExSpouses;
+            var exSpouses = hero.ExSpouses?.ToList() ?? new List<Hero>();
 
-            InformationManager.DisplayMessage(new InformationMessage($"DEBUG: Run RemoveExSpouses.", Colors.Red));
-
-            /* if (hero.Spouse != null)
-            {
-                InformationManager.DisplayMessage(new InformationMessage($"Você já é casado.", Colors.Red));
-                return;
-            } */
+            // InformationManager.DisplayMessage(new InformationMessage($"DEBUG: RemoveExSpouses({removalMode})", Colors.Red));
 
             if (removalMode == RemoveExSpousesMode.Duplicates)
             {
-                // Standard remove duplicates spouse
-                // Get exspouse list without duplicates
-                _exSpousesList = _exSpousesList.Distinct().ToList();
-                // If exspouse is already a spouse, then remove from exspouses
-                if (_exSpousesList.Contains(hero.Spouse))
+                // Remove duplicatas da própria lista
+                exSpouses = exSpouses.Distinct().ToList();
+
+                // Remove o cônjuge atual da lista de ex-cônjuges
+                if (hero.Spouse is not null && exSpouses.Contains(hero.Spouse))
                 {
-                    _exSpousesList.Remove(hero.Spouse);
-                    Print($"Removed duplicate spouse {hero.Spouse.Name}");
+                    exSpouses.Remove(hero.Spouse);
+                    Print($"Removed active spouse {hero.Spouse.Name} from ex-spouses.");
                 }
             }
             else
             {
-                // Remove all exspouses
-                _exSpousesList = _exSpousesList.ToList();
-                List<Hero> exSpouses = _exSpousesList.Where(exSpouse => exSpouse.IsAlive).ToList();
-                foreach (Hero exSpouse in exSpouses)
+                var cleaned = new List<Hero>();
+
+                foreach (var exSpouse in exSpouses.ToList()) // snapshot seguro
                 {
+                    if (!exSpouse.IsAlive)
+                        continue;
+
                     if (removalMode == RemoveExSpousesMode.Self || removalMode == RemoveExSpousesMode.All)
                     {
-                        // Remove exspouse from list
-                        _exSpousesList.Remove(exSpouse);
+                        // Remove da lista do herói
+                        cleaned.Add(exSpouse);
                     }
+
                     if (removalMode == RemoveExSpousesMode.All)
                     {
-                        // Look into your exspouse's exspouse to remove yourself
-                        List<Hero> _exSpousesList2 = _exSpouses!(hero);
-                        _exSpousesList2.Remove(hero);
+                        var theirExSpouses = _exSpouses(exSpouse)?.ToList() ?? new List<Hero>();
+                        theirExSpouses.Remove(hero);
 
-                        MBReadOnlyList<Hero> ExSpousesReadOnlyList2 = new(_exSpousesList2);
-                        _exSpouses(exSpouse) = _exSpousesList2;
-                        ExSpouses!(exSpouse) = ExSpousesReadOnlyList2;
+                        _exSpouses(exSpouse) = theirExSpouses;
+                        ExSpouses(exSpouse) = new MBReadOnlyList<Hero>(theirExSpouses);
                     }
                 }
+
+                // Apaga do herói após o loop
+                foreach (var ex in cleaned)
+                    exSpouses.Remove(ex);
             }
 
-            if (_exSpousesList != null)
-            {
-                MBReadOnlyList<Hero> ExSpousesReadOnlyList = new MBReadOnlyList<Hero>(_exSpousesList);
+            _exSpouses(hero) = exSpouses;
+            ExSpouses(hero) = new MBReadOnlyList<Hero>(exSpouses);
 
-
-                string _exSpousesListPresent = _exSpousesList == null ? "Null" : "Present";
-                string readonlylist = ExSpousesReadOnlyList == null ? "Null" : "Present";
-
-                InformationManager.DisplayMessage(new InformationMessage($"_exSpousesList: {_exSpousesListPresent}", Colors.Red));
-                InformationManager.DisplayMessage(new InformationMessage($"ExSpousesReadOnlyList: {readonlylist}", Colors.Red));
-
-                if (_exSpouses != null && ExSpouses != null)
-                {
-                    _exSpouses(hero) = _exSpousesList;
-                    ExSpouses(hero) = ExSpousesReadOnlyList;
-                }
-            }
+            Print($"Ex-spouses after cleanup: {exSpouses.Count}");
         }
 
         public static void CheatOnSpouse()

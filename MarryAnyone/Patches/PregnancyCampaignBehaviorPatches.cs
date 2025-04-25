@@ -154,6 +154,7 @@ namespace MarryAnyone.Patches
                 {
                     return;
                 }
+
                 // Make things looks better in the encyclopedia
                 if (hero == Hero.MainHero)
                 {
@@ -161,6 +162,7 @@ namespace MarryAnyone.Patches
                     Print("   Main Hero Spouse Unassigned");
                     hero.Spouse = null;
                 }
+
                 if (Hero.MainHero.ExSpouses.Contains(hero) || hero.Spouse == Hero.MainHero)
                 {
                     if (hero.Spouse is null || hero.Spouse != Hero.MainHero)
@@ -177,10 +179,12 @@ namespace MarryAnyone.Patches
                         hero.Spouse = Hero.MainHero;
                     }
                 }
-                foreach (Hero exSpouse in hero.ExSpouses.ToList())
+
+                var exSpouses = hero.ExSpouses.Distinct().ToList();
+                RemoveExSpouses(hero);
+                foreach (var ex in exSpouses)
                 {
-                    RemoveExSpouses(hero);
-                    RemoveExSpouses(exSpouse);
+                    RemoveExSpouses(ex);
                 }
             }
         }
