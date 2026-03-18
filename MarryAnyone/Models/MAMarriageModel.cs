@@ -61,10 +61,6 @@ namespace MarryAnyone.Models
             }
 
             MASettings settings = new();
-            if (settings == null)
-            {
-                return false;
-            }
 
             if (!settings.Incest)
             {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using TaleWorlds.Library;
-using RecruitEveryone.Settings;
 
 namespace MarryAnyone.Settings
 {
@@ -366,10 +365,20 @@ namespace MarryAnyone.Settings
                 });
                 for (int i = 0; i < array.Length; i++)
                 {
-                    string[] array2 = array[i].Split(new char[]
+                    string line = array[i].Trim();
+                    if (string.IsNullOrEmpty(line))
+                    {
+                        continue;
+                    }
+                    string[] array2 = line.Split(new char[]
                     {
                         '='
-                    });
+                    }, 2);
+                    if (array2.Length < 2)
+                    {
+                        flag = true;
+                        continue;
+                    }
                     PropertyInfo property = typeof(MAConfig).GetProperty(array2[0]);
                     if (property is null)
                     {

@@ -3,6 +3,8 @@ using TaleWorlds.CampaignSystem;
 using MarryAnyone.Patches;
 using Helpers;
 using TaleWorlds.CampaignSystem.Party;
+using HarmonyLib.BUTR.Extensions;
+using System;
 
 namespace MarryAnyone.Actions
 {
@@ -11,6 +13,9 @@ namespace MarryAnyone.Actions
         /* Properties */
         //private delegate void PlayerDefaultFactionDelegate(Campaign instance, Clan @value);
         //private static readonly PlayerDefaultFactionDelegate? PlayerDefaultFaction = AccessTools2.GetPropertySetterDelegate<PlayerDefaultFactionDelegate>(typeof(Campaign), "PlayerDefaultFaction");
+
+        private delegate void OnHeroesMarriedDelegate(CampaignEventDispatcher instance, Hero firstHero, Hero secondHero, bool showNotification);
+        private static readonly OnHeroesMarriedDelegate? _onHeroesMarried = AccessTools2.GetDelegate<OnHeroesMarriedDelegate>(typeof(CampaignEventDispatcher), "OnHeroesMarried", new Type[] { typeof(Hero), typeof(Hero), typeof(bool) });
 
         // Appears to ultimately avoid disbanding parties and the like...
         // Never disband party for hero, do for everyone else...
@@ -206,7 +211,7 @@ namespace MarryAnyone.Actions
             EndAllCourtshipsPatch.EndAllCourtships(firstHero);
             EndAllCourtshipsPatch.EndAllCourtships(secondHero);
             ChangeRomanticStateAction.Apply(firstHero, secondHero, Romance.RomanceLevelEnum.Marriage);
-            CampaignEventDispatcher.Instance.OnHeroesMarried(firstHero, secondHero, showNotification);
+            _onHeroesMarried?.Invoke(CampaignEventDispatcher.Instance, firstHero, secondHero, showNotification);
         }
 
         public static void Apply(Hero firstHero, Hero secondHero, bool showNotification = true)

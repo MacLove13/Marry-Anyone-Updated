@@ -3,7 +3,7 @@ using TaleWorlds.Engine;
 using TaleWorlds.Library;
 
 // Adapted from Taleworlds.Engine.Utilities
-namespace RecruitEveryone.Settings
+namespace MarryAnyone.Settings
 {
     internal static class MAUtilities
     {
@@ -53,7 +53,7 @@ namespace RecruitEveryone.Settings
             }
             catch
             {
-                Debug.Print("Could not create Marry Anyone Config file", 0, Debug.DebugColor.White);
+                TaleWorlds.Library.Debug.Print("Could not create Marry Anyone Config file", 0, TaleWorlds.Library.Debug.DebugColor.White);
                 result = SaveResult.ConfigFileFailure;
             }
             return result;
