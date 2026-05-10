@@ -43,21 +43,13 @@ namespace MarryAnyone
                 return;
             }
 
-            var exSpouses = hero.ExSpouses?.ToList() ?? new List<Hero>();
+            var exSpouses = NormalizeExSpouses(hero, hero.ExSpouses?.ToList() ?? new List<Hero>());
 
             // InformationManager.DisplayMessage(new InformationMessage($"DEBUG: RemoveExSpouses({removalMode})", Colors.Red));
 
             if (removalMode == RemoveExSpousesMode.Duplicates)
             {
-                // Remove duplicates from own list and nulls
-                exSpouses = exSpouses.Where(ex => ex is not null).Distinct().ToList();
-
-                // Remove current spouse from ex-spouses list
-                if (hero.Spouse is not null && exSpouses.Contains(hero.Spouse))
-                {
-                    exSpouses.Remove(hero.Spouse);
-                    Print($"Removed active spouse {hero.Spouse.Name} from ex-spouses.");
-                }
+                // No-op, list is already normalized above.
             }
             else
             {
@@ -76,8 +68,8 @@ namespace MarryAnyone
 
                     if (removalMode == RemoveExSpousesMode.All)
                     {
-                        var theirExSpouses = _exSpouses(exSpouse)?.ToList() ?? new List<Hero>();
-                        theirExSpouses.Remove(hero);
+                        var theirExSpouses = NormalizeExSpouses(exSpouse, _exSpouses(exSpouse)?.ToList() ?? new List<Hero>());
+                        theirExSpouses.RemoveAll(existing => existing.StringId == hero.StringId);
 
                         _exSpouses(exSpouse) = theirExSpouses;
                         ExSpouses(exSpouse) = new MBReadOnlyList<Hero>(theirExSpouses);
@@ -86,13 +78,29 @@ namespace MarryAnyone
 
                 // Remove from hero after loop
                 foreach (var ex in cleaned)
-                    exSpouses.Remove(ex);
+                    exSpouses.RemoveAll(existing => existing.StringId == ex.StringId);
             }
 
             _exSpouses(hero) = exSpouses;
             ExSpouses(hero) = new MBReadOnlyList<Hero>(exSpouses);
 
             Print($"Ex-spouses after cleanup: {exSpouses.Count}");
+        }
+
+        private static List<Hero> NormalizeExSpouses(Hero hero, List<Hero> exSpouses)
+        {
+            var normalized = exSpouses
+                .Where(ex => ex is not null && ex.StringId != hero.StringId)
+                .GroupBy(ex => ex.StringId)
+                .Select(group => group.First())
+                .ToList();
+
+            if (hero.Spouse is not null)
+            {
+                normalized.RemoveAll(ex => ex.StringId == hero.Spouse.StringId);
+            }
+
+            return normalized;
         }
 
         public static void CheatOnSpouse()
