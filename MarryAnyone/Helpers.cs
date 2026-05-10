@@ -90,7 +90,7 @@ namespace MarryAnyone
         private static List<Hero> NormalizeExSpouses(Hero hero, List<Hero> exSpouses)
         {
             var normalized = exSpouses
-                .Where(ex => ex is not null && ex != hero)
+                .Where(ex => ex is not null && ex.StringId != hero.StringId)
                 .GroupBy(ex => ex.StringId)
                 .Select(group => group.First())
                 .ToList();
