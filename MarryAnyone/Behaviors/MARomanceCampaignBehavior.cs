@@ -501,8 +501,11 @@ namespace MarryAnyone.Behaviors
             if (settings.TemplateCharacter == "Wanderer")
             {
                 // Give hero random wanderer's focus, skills, and combat equipment with same culture and sex
-                template = conversationCharacter.Culture.NotableAndWandererTemplates.GetRandomElementWithPredicate(
-                    (CharacterObject x) => x.Occupation == Occupation.Wanderer && x.IsFemale == conversationCharacter.IsFemale);
+                template = CharacterObject.All.GetRandomElementWithPredicate(
+                    (CharacterObject x) => x.IsTemplate && x.Occupation == Occupation.Wanderer
+                        && x.IsFemale == conversationCharacter.IsFemale
+                        && (conversationCharacter.Culture is null || x.Culture == conversationCharacter.Culture))
+                    ?? conversationCharacter;
             }
 
             // Create a new hero!
@@ -525,7 +528,7 @@ namespace MarryAnyone.Behaviors
             // Give hero agent's equipment
             Equipment civilianEquipment = conversationAgent.SpawnEquipment.Clone();
             // CharacterObject -> RandomBattleEquipment
-            Equipment battleEquipment = template.AllEquipments.GetRandomElementWithPredicate((Equipment e) => !e.IsCivilian).Clone();
+            Equipment battleEquipment = template.RandomBattleEquipment.Clone();
             EquipmentHelper.AssignHeroEquipmentFromEquipment(_companionHero, civilianEquipment);
             EquipmentHelper.AssignHeroEquipmentFromEquipment(_companionHero, battleEquipment);
 

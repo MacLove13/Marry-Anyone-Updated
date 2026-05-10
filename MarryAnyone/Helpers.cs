@@ -38,16 +38,21 @@ namespace MarryAnyone
 
         public static void RemoveExSpouses(Hero hero, RemoveExSpousesMode removalMode = RemoveExSpousesMode.Duplicates)
         {
+            if (_exSpouses is null || ExSpouses is null)
+            {
+                return;
+            }
+
             var exSpouses = hero.ExSpouses?.ToList() ?? new List<Hero>();
 
             // InformationManager.DisplayMessage(new InformationMessage($"DEBUG: RemoveExSpouses({removalMode})", Colors.Red));
 
             if (removalMode == RemoveExSpousesMode.Duplicates)
             {
-                // Remove duplicatas da própria lista
-                exSpouses = exSpouses.Distinct().ToList();
+                // Remove duplicates from own list and nulls
+                exSpouses = exSpouses.Where(ex => ex is not null).Distinct().ToList();
 
-                // Remove o cônjuge atual da lista de ex-cônjuges
+                // Remove current spouse from ex-spouses list
                 if (hero.Spouse is not null && exSpouses.Contains(hero.Spouse))
                 {
                     exSpouses.Remove(hero.Spouse);
@@ -58,14 +63,14 @@ namespace MarryAnyone
             {
                 var cleaned = new List<Hero>();
 
-                foreach (var exSpouse in exSpouses.ToList()) // snapshot seguro
+                foreach (var exSpouse in exSpouses.Where(ex => ex is not null).ToList())
                 {
                     if (!exSpouse.IsAlive)
                         continue;
 
                     if (removalMode == RemoveExSpousesMode.Self || removalMode == RemoveExSpousesMode.All)
                     {
-                        // Remove da lista do herói
+                        // Remove from hero list
                         cleaned.Add(exSpouse);
                     }
 
@@ -79,7 +84,7 @@ namespace MarryAnyone
                     }
                 }
 
-                // Apaga do herói após o loop
+                // Remove from hero after loop
                 foreach (var ex in cleaned)
                     exSpouses.Remove(ex);
             }
@@ -92,7 +97,11 @@ namespace MarryAnyone
 
         public static void CheatOnSpouse()
         {
-            List<Hero> _exSpousesList = _exSpouses!(Hero.MainHero);
+            if (_exSpouses is null || ExSpouses is null)
+            {
+                return;
+            }
+            List<Hero> _exSpousesList = _exSpouses(Hero.MainHero);
             List<Hero> cheatedHeroes = _exSpousesList.Where(exSpouse => exSpouse.IsAlive).ToList();
 
             foreach (Hero cheatedHero in cheatedHeroes)

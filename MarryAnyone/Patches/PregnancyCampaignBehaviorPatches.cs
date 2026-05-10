@@ -14,10 +14,9 @@ namespace MarryAnyone.Patches
     [HarmonyPatch(typeof(PregnancyCampaignBehavior), "DailyTickHero")]
     internal static class PregnancyCampaignBehaviorPatches
     {
-        private static List<Hero>? _spouses;
-
         private static void Prefix(Hero hero)
         {
+            List<Hero>? _spouses = null;
             MASettings settings = new();
             if (settings.PregnancyPlus)
             {
@@ -31,7 +30,7 @@ namespace MarryAnyone.Patches
                     // If you are the MainHero go through advanced process
                     if (hero == Hero.MainHero || hero == Hero.MainHero.Spouse || Hero.MainHero.ExSpouses.Contains(hero))
                     {
-                        if (hero.Spouse is null && (hero.ExSpouses.IsEmpty() || hero.ExSpouses is null))
+                        if (hero.Spouse is null && (hero.ExSpouses is null || hero.ExSpouses.IsEmpty()))
                         {
                             Print("    No Spouse");
                             return;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Library;
 
@@ -8,6 +9,12 @@ namespace MarryAnyone.CampaignSystem
     /* Reference CampaignCheats */
     public static class MACommands
     {
+        private static Hero? FindHeroByName(string heroName)
+        {
+            return Hero.AllAliveHeroes.FirstOrDefault(h => h.Name.ToString() == heroName)
+                ?? Hero.DeadOrDisabledHeroes.FirstOrDefault(h => h.Name.ToString() == heroName);
+        }
+
         /* Actions */
         [CommandLineFunctionality.CommandLineArgumentFunction("reset_courtships", "marry_anyone")]
         public static string ResetCourtships(List<string> strings)
@@ -29,7 +36,7 @@ namespace MarryAnyone.CampaignSystem
             }
 
             string text = CampaignCheats.ConcatenateString(strings);
-            Hero hero = CampaignCheats.GetHero(text);
+            Hero? hero = FindHeroByName(text);
             if (hero is not null) 
             {
                 if (Hero.MainHero.ExSpouses is not null)
@@ -115,7 +122,7 @@ namespace MarryAnyone.CampaignSystem
                 return "Input is incorrect [0/1].";
             }
             bool flag = strings[0] == "1";
-            settings.PregnancyPlus = flag;
+            settings.Cheating = flag;
             return "Setting cheating is " + (flag ? "enabled." : "disabled.");
         }
 
@@ -191,12 +198,12 @@ namespace MarryAnyone.CampaignSystem
             }
             else if (string.Equals(template, "en", StringComparison.OrdinalIgnoreCase))
             {
-                settings.SexualOrientation = "en";
+                settings.Language = "en";
                 return "Success";
             }
             else if (string.Equals(template, "pt-BR", StringComparison.OrdinalIgnoreCase))
             {
-                settings.SexualOrientation = "pt-BR";
+                settings.Language = "pt-BR";
                 return "Success";
             }
             return "Please enter \"en\", \"pt-BR\"";
@@ -237,7 +244,7 @@ namespace MarryAnyone.CampaignSystem
         public static string SetCharacterTemplate(List<string> strings)
         {
             MASettings settings = new();
-            if (!CampaignCheats.CheckHelp(strings) || CampaignCheats.CheckParameters(strings, 0))
+            if (!CampaignCheats.CheckParameters(strings, 1) || CampaignCheats.CheckHelp(strings))
             {
                 return "Format is \"marry_anyone.set_character_template [\"default\"/\"wanderer\"]\".";
             }
