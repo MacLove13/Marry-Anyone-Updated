@@ -10,8 +10,9 @@ namespace MarryAnyone.Models
 {
     internal sealed class MAMarriageModel : DefaultMarriageModel
     {
-        private delegate IEnumerable<Hero> DiscoverAncestorsDelegate(DefaultMarriageModel instance, Hero hero, int n);
-        private static readonly DiscoverAncestorsDelegate? DiscoverAncestors = AccessTools2.GetDelegate<DiscoverAncestorsDelegate>(typeof(DefaultMarriageModel), "DiscoverAncestors", new Type[] { typeof(Hero), typeof(int) });
+        // Bannerlord v1.4.6 removed DefaultMarriageModel.DiscoverAncestors; the incest/relation check is now AreHeroesRelated(first, second, ancestorDepth)
+        private delegate bool AreHeroesRelatedDelegate(DefaultMarriageModel instance, Hero firstHero, Hero secondHero, int ancestorDepth);
+        private static readonly AreHeroesRelatedDelegate? AreHeroesRelated = AccessTools2.GetDelegate<AreHeroesRelatedDelegate>(typeof(DefaultMarriageModel), "AreHeroesRelated", new Type[] { typeof(Hero), typeof(Hero), typeof(int) });
 
         private bool _mainHeroMarriage = false;
         private bool _mainHero = false;
@@ -64,9 +65,9 @@ namespace MarryAnyone.Models
 
             if (!settings.Incest)
             {
-                if (DiscoverAncestors != null)
+                if (AreHeroesRelated != null)
                 {
-                    if (DiscoverAncestors(this, firstHero, 3).Intersect(DiscoverAncestors(this, secondHero, 3)).Any())
+                    if (AreHeroesRelated(this, firstHero, secondHero, 3))
                     {
                         return false;
                     }

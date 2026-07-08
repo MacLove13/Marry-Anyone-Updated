@@ -14,8 +14,9 @@ namespace MarryAnyone.Actions
         //private delegate void PlayerDefaultFactionDelegate(Campaign instance, Clan @value);
         //private static readonly PlayerDefaultFactionDelegate? PlayerDefaultFaction = AccessTools2.GetPropertySetterDelegate<PlayerDefaultFactionDelegate>(typeof(Campaign), "PlayerDefaultFaction");
 
-        private delegate void OnHeroesMarriedDelegate(CampaignEventDispatcher instance, Hero firstHero, Hero secondHero, bool showNotification);
-        private static readonly OnHeroesMarriedDelegate? _onHeroesMarried = AccessTools2.GetDelegate<OnHeroesMarriedDelegate>(typeof(CampaignEventDispatcher), "OnHeroesMarried", new Type[] { typeof(Hero), typeof(Hero), typeof(bool) });
+        // Bannerlord v1.4.6 renamed CampaignEventDispatcher.OnHeroesMarried -> OnBeforeHeroesMarried (same signature)
+        private delegate void OnBeforeHeroesMarriedDelegate(CampaignEventDispatcher instance, Hero firstHero, Hero secondHero, bool showNotification);
+        private static readonly OnBeforeHeroesMarriedDelegate? _onBeforeHeroesMarried = AccessTools2.GetDelegate<OnBeforeHeroesMarriedDelegate>(typeof(CampaignEventDispatcher), "OnBeforeHeroesMarried", new Type[] { typeof(Hero), typeof(Hero), typeof(bool) });
 
         // Appears to ultimately avoid disbanding parties and the like...
         // Never disband party for hero, do for everyone else...
@@ -211,7 +212,7 @@ namespace MarryAnyone.Actions
             EndAllCourtshipsPatch.EndAllCourtships(firstHero);
             EndAllCourtshipsPatch.EndAllCourtships(secondHero);
             ChangeRomanticStateAction.Apply(firstHero, secondHero, Romance.RomanceLevelEnum.Marriage);
-            _onHeroesMarried?.Invoke(CampaignEventDispatcher.Instance, firstHero, secondHero, showNotification);
+            _onBeforeHeroesMarried?.Invoke(CampaignEventDispatcher.Instance, firstHero, secondHero, showNotification);
         }
 
         public static void Apply(Hero firstHero, Hero secondHero, bool showNotification = true)
