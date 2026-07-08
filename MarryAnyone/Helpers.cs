@@ -11,9 +11,26 @@ namespace MarryAnyone
 {
     internal static class Helpers
     {
-        private static readonly AccessTools.FieldRef<Hero, MBReadOnlyList<Hero>>? ExSpouses = AccessTools2.FieldRefAccess<Hero, MBReadOnlyList<Hero>>("ExSpouses");
+        // Bannerlord v1.4.6: Hero.ExSpouses is now a get-only property (MBReadOnlyList<Hero>) backed by
+        // the field _exSpouses, whose type changed from List<Hero> to MBList<Hero>. There is no longer a
+        // separate ExSpouses backing field, so we mutate the _exSpouses list in place.
+        private static readonly AccessTools.FieldRef<Hero, MBList<Hero>>? _exSpouses = AccessTools2.FieldRefAccess<Hero, MBList<Hero>>("_exSpouses");
 
-        private static readonly AccessTools.FieldRef<Hero, List<Hero>>? _exSpouses = AccessTools2.FieldRefAccess<Hero, List<Hero>>("_exSpouses");
+        // Overwrite a hero's ex-spouse list in place so the ExSpouses property (which wraps this field) stays in sync.
+        private static void SetExSpouses(Hero hero, List<Hero> newList)
+        {
+            MBList<Hero> list = _exSpouses!(hero);
+            if (list is null)
+            {
+                list = new MBList<Hero>();
+                _exSpouses!(hero) = list;
+            }
+            list.Clear();
+            foreach (Hero h in newList)
+            {
+                list.Add(h);
+            }
+        }
 
         public enum RemoveExSpousesMode
         {
@@ -38,7 +55,7 @@ namespace MarryAnyone
 
         public static void RemoveExSpouses(Hero hero, RemoveExSpousesMode removalMode = RemoveExSpousesMode.Duplicates)
         {
-            if (_exSpouses is null || ExSpouses is null)
+            if (_exSpouses is null)
             {
                 return;
             }
@@ -79,8 +96,7 @@ namespace MarryAnyone
                         var theirExSpouses = _exSpouses(exSpouse)?.ToList() ?? new List<Hero>();
                         theirExSpouses.Remove(hero);
 
-                        _exSpouses(exSpouse) = theirExSpouses;
-                        ExSpouses(exSpouse) = new MBReadOnlyList<Hero>(theirExSpouses);
+                        SetExSpouses(exSpouse, theirExSpouses);
                     }
                 }
 
@@ -89,20 +105,19 @@ namespace MarryAnyone
                     exSpouses.Remove(ex);
             }
 
-            _exSpouses(hero) = exSpouses;
-            ExSpouses(hero) = new MBReadOnlyList<Hero>(exSpouses);
+            SetExSpouses(hero, exSpouses);
 
             Print($"Ex-spouses after cleanup: {exSpouses.Count}");
         }
 
         public static void CheatOnSpouse()
         {
-            if (_exSpouses is null || ExSpouses is null)
+            if (_exSpouses is null)
             {
                 return;
             }
-            List<Hero> _exSpousesList = _exSpouses(Hero.MainHero);
-            List<Hero> cheatedHeroes = _exSpousesList.Where(exSpouse => exSpouse.IsAlive).ToList();
+            MBList<Hero> _exSpousesList = _exSpouses(Hero.MainHero);
+            List<Hero> cheatedHeroes = _exSpousesList?.Where(exSpouse => exSpouse.IsAlive).ToList() ?? new List<Hero>();
 
             foreach (Hero cheatedHero in cheatedHeroes)
             {
